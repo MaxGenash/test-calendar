@@ -1,38 +1,39 @@
 import React, {useState} from "react";
-import { Button, Modal } from "react-bootstrap"
 import CalendarGrid from "./CalendarGrid";
-import FormCreateAppointment from "./FormCreateAppointment";
+import ModalCreateAppointment from "./ModalCreateAppointment";
+import {getAppointmentId} from "./utils";
 
 function Calendar() {
-    const [show, setShow] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
-    const closeModal = () => setShow(false);
+    const [savedAppointments, setSavedAppointments] = useState({});
+
+    const closeModal = () => setIsModalOpen(false);
     const createAppointment = (date, time) => {
         setSelectedDate(date);
         setSelectedTime(time);
-        setShow(true);
+        setIsModalOpen(true);
+    }
+    const saveAppointment = (name) => {
+        const appointmentId = getAppointmentId(selectedDate, selectedTime);
+        setSavedAppointments({
+            ...savedAppointments,
+            [appointmentId]: { name }
+        })
+        closeModal();
     }
 
     return (
         <>
-            <CalendarGrid createAppointment={createAppointment} />
-            <Modal show={show} onHide={closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create Appointment</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <FormCreateAppointment date={selectedDate} time={selectedTime} />
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={closeModal}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={closeModal}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <CalendarGrid savedAppointments={savedAppointments} createAppointment={createAppointment} />
+            <ModalCreateAppointment
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={saveAppointment}
+                appointmentDate={selectedDate}
+                appointmentTime={selectedTime}
+            />
         </>
     );
 }

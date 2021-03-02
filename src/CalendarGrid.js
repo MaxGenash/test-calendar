@@ -1,32 +1,43 @@
 import React from "react";
-
 import { Table } from "react-bootstrap"
-import { getDatesArr, getTimesArr } from "./utils";
+import { getAppointmentId, getDatesArr, getTimesArr } from "./utils";
 
 function GridRow({ time, children }) {
     return (
-        <tr key={time + '_1'}>
+        <tr>
             <td key={time + '_1_0'} className="calendar-grid__time-cell"> { time } </td>
             {children}
         </tr>
     );
 }
 
-function GridActionCell({ time, date, onClick }) {
+function GridActionCell({ time, date, existingAppointment, onClick }) {
     return (
-        <td key={time + date} onClick={onClick} className="calendar-grid__actions-cell" />
+        <td onClick={onClick} className="calendar-grid__actions-cell" >
+            {existingAppointment.name}
+        </td>
     );
 }
 
-function CalendarGrid({ createAppointment }) {
+function CalendarGrid({ savedAppointments, createAppointment }) {
     const datesArr = getDatesArr();
 
     let rows = getTimesArr().map((time) => {
-        const cells = datesArr.map(date => (
-            <GridActionCell time={time} date={date} onClick={() => createAppointment(date, time)}/>
-        ));
+        const cells = datesArr.map(date => {
+            const appointmentId = getAppointmentId(date, time);
+            const existingAppointment = savedAppointments[appointmentId] || {};
+            return (
+                <GridActionCell
+                    key={time + date}
+                    time={time}
+                    date={date}
+                    existingAppointment={existingAppointment}
+                    onClick={() => createAppointment(date, time)}
+                />
+            )
+        });
         return (
-            <GridRow time={time}>
+            <GridRow key={time + '_1'} time={time}>
                 {cells}
             </GridRow>
         );

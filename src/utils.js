@@ -17,3 +17,7 @@ export function getDatesArr() {
         'Sun 7',
     ];
 }
+
+export function getAppointmentId(date, time) {
+    return `${date}_${time}`;
+}
